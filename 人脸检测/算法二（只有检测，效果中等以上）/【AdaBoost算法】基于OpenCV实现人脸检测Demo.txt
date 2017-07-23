@@ -1,0 +1,46 @@
+#include <opencv/highgui.h>
+#include <opencv/cv.h>
+#include <opencv2/imgproc/imgproc_c.h>
+#include <opencv2/objdetect/objdetect.hpp>
+
+using namespace cv;
+
+int main(int argc, char** argv)
+{
+
+	CascadeClassifier stFaceCascade;
+	IplImage *pstImage = NULL;
+	std::vector<Rect> faceRects;
+
+	if (!stFaceCascade.load("D:\\opencv2.4.9\\opencv\\sources\\data\\haarcascades\\haarcascade_frontalface_alt.xml"))
+	{
+		printf("Loading cascade error\n");
+		return -1;
+	}
+
+	pstImage = cvLoadImage("C:\\Users\\Timmy\\Desktop\\2334.jpg", CV_LOAD_IMAGE_COLOR);
+
+	stFaceCascade.detectMultiScale(pstImage,
+		faceRects,            //检出结果
+		1.1,                  //缩放步长
+		2,                    //框融合时的最小检出个数
+		0 | CV_HAAR_SCALE_IMAGE,//标志 |CV_HAAR_FIND_BIGGEST_OBJECT|CV_HAAR_DO_ROUGH_SEARCH|CV_HAAR_DO_CANNY_PRUNING
+		Size(30, 30),         //最小人脸尺寸
+		Size(300, 300));     //最大人脸尺寸
+	printf("Face Num[%d]\n", faceRects.size());
+
+	for (unsigned int j = 0; j < faceRects.size(); j++)
+	{
+		cvRectangle(pstImage,
+			cvPoint(faceRects[j].x, faceRects[j].y),
+			cvPoint(faceRects[j].x + faceRects[j].width, faceRects[j].y + faceRects[j].height),
+			cvScalar(0, 255, 0),
+			2, 8, 0);
+	}
+	cvShowImage("FDWin", pstImage);
+	cvWaitKey(0);
+
+
+	cvReleaseImage(&pstImage);
+	return 0;
+}

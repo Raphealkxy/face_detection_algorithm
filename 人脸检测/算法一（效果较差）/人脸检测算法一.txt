@@ -1,0 +1,70 @@
+
+#include "opencv2/opencv.hpp"  
+#include <iostream>   
+using namespace std;
+using namespace cv;
+
+
+string cascadeName = "D:\\opencv2.4.9\\opencv\\sources\\data\\haarcascades\\haarcascade_frontalface_alt.xml";
+
+
+IplImage* cutImage(IplImage* src, CvRect rect) {
+	cvSetImageROI(src, rect);
+	IplImage* dst = cvCreateImage(cvSize(rect.width, rect.height),
+		src->depth,
+		src->nChannels);
+
+	cvCopy(src, dst, 0);
+	cvResetImageROI(src);
+	return dst;
+}
+
+
+IplImage* detect(Mat& img, CascadeClassifier& cascade, double scale)
+{
+	int i = 0;
+	double t = 0;
+	vector<Rect> faces;
+	Mat gray, smallImg(cvRound(img.rows / scale), cvRound(img.cols / scale), CV_8UC1);
+
+	cvtColor(img, gray, CV_BGR2GRAY);
+	resize(gray, smallImg, smallImg.size(), 0, 0, INTER_LINEAR);
+	equalizeHist(smallImg, smallImg);
+	t = (double)cvGetTickCount();
+	cascade.detectMultiScale(smallImg, faces, 1.3, 2, CV_HAAR_SCALE_IMAGE, Size(30, 30));
+	t = (double)cvGetTickCount() - t;
+	printf("detection time = %g ms\n", t / ((double)cvGetTickFrequency()*1000.));
+	for (vector<Rect>::const_iterator r = faces.begin(); r != faces.end(); r++, i++)
+	{
+		IplImage* temp = cutImage(&(IplImage(img)), cvRect(r->x, r->y, 250, 250));// »ò r->width, r->height    
+		return temp;
+	}
+	return NULL;
+}
+
+
+
+
+int main(int argc, char* argv[])
+{
+	CascadeClassifier cascade;
+	if (!cascade.load(cascadeName))
+	{
+		return -1;
+	}
+
+	Mat srcImg, targetImg;
+	IplImage* faceImage1;
+	srcImg = imread("C:\\Users\\Timmy\\Desktop\\we.jpg");
+	faceImage1 = detect(srcImg, cascade, 1);
+
+	if (faceImage1 == NULL) {
+		return -1;
+	}
+
+	cvSaveImage("face.jpg", faceImage1, 0);
+
+	cout << "over";
+	getchar();
+	return 0;
+}

@@ -1,0 +1,8 @@
+
+public class JavaCvDemo {
+        
+	 static {
+	        System.loadLibrary("hello");
+	    }
+	 public native void detectFace(String cascade, String filename); 
+}

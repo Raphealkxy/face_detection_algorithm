@@ -1,0 +1,1 @@
+E:\eclipse_workspace\test01\src>javah -classpath E:\eclipse_workspace\test01\bin -d C:\Users\Timmy\Desktop\java\ -jni com.timmy.test.main
